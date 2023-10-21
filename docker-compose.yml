@@ -14,7 +14,8 @@ services:
     build: .
     command: sh -c "python manage.py migrate &&
       yes | python manage.py collectstatic --no-input &&
-      gunicorn ${PROJECT_NAME}.wsgi:application --workers=${GUNICORN_WORKERS} --timeout=${GUNICORN_TIMEOUT} --bind 0.0.0.0:${GUNICORN_PORT}"
+      python manage.py runserver ${SITE_URL}:${GUNICORN_PORT}"
+      # gunicorn ${PROJECT_NAME}.wsgi:application --workers=${GUNICORN_WORKERS} --timeout=${GUNICORN_TIMEOUT} --bind 0.0.0.0:${GUNICORN_PORT}"
     volumes:
       - .:/app
       - static_volume:/app/static
@@ -23,6 +24,8 @@ services:
     restart: unless-stopped
     expose:
       - ${GUNICORN_PORT}
+    ports:
+      - ${GUNICORN_PORT}:${GUNICORN_PORT}
     healthcheck:
       test: [ "CMD", "curl", "-f", "http://${SITE_URL}:${GUNICORN_PORT}" ]
       interval: 10s
@@ -33,6 +36,8 @@ services:
 
   minio:
     image: minio/minio
+    expose:
+      - "9000"
     ports:
       - "9000:9000"
     env_file:
