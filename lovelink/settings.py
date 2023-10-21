@@ -105,4 +105,9 @@ USE_TZ = True
 
 STATIC_URL = 'static/'
 
+STATIC_ROOT = os.environ.get("STATIC_ROOT", 'static')
+
+MEDIA_ROOT = os.environ.get("MEDIA_ROOT", 'uploads')
+MEDIA_URL = os.environ.get("MEDIA_URL", "media/")
+
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'

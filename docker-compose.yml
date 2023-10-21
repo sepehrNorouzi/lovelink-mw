@@ -1,0 +1,37 @@
+services:
+  postgres:
+    image: postgres:14.4-alpine
+    env_file:
+      - ./.env
+    restart: unless-stopped
+    container_name: ${PROJECT_NAME}-postgres
+    volumes:
+      - postgres_data:/var/lib/postgresql/data/
+    expose:
+      - ${POSTGRES_PORT}
+
+  web:
+    build: .
+    command: sh -c "python manage.py migrate &&
+      yes | python manage.py collectstatic --no-input &&
+      gunicorn ${PROJECT_NAME}.wsgi:application --workers=${GUNICORN_WORKERS} --timeout=${GUNICORN_TIMEOUT} --bind 0.0.0.0:${GUNICORN_PORT}"
+    volumes:
+      - .:/app
+      - static_volume:/app/static
+      - media_volume:/app/media
+    container_name: ${PROJECT_NAME}-app
+    restart: unless-stopped
+    expose:
+      - ${GUNICORN_PORT}
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://${SITE_URL}:${GUNICORN_PORT}" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    depends_on:
+      - postgres
+
+volumes:
+  static_volume:
+  media_volume:
+  postgres_data:
