@@ -31,7 +31,18 @@ services:
     depends_on:
       - postgres
 
+  minio:
+    image: minio/minio
+    ports:
+      - "9000:9000"
+    env_file:
+      - ./.env
+    volumes:
+      - minio_data:/data
+    command: server /data
+
 volumes:
+  minio_data:
   static_volume:
   media_volume:
   postgres_data:
