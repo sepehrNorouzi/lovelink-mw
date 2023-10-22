@@ -10,3 +10,5 @@ redis~=5.0.1
 psycopg2-binary>=2.9
 minio~=7.1.17
 django-storages~=1.14.2
+Pillow~=10.1.0
+boto3~=1.28.68
